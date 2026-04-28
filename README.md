@@ -207,17 +207,6 @@ Final: Global max pooling → Concatenation (864-dim) → FC (864 → 512 → 25
 
 ---
 
-## Citation
-
-```bibtex
-@article{wang2025ihgcnpla,
-  title={IHGCN-PLA: An Interpretable Heterogeneous Graph Convolutional Network for Protein-Ligand Binding Affinity Prediction with Multimodal Interaction Fusion},
-  author={Wang, Guishen and Kong, Yuxiang and Fu, Yuyouqiang and Li, Gaoyang and Cao, Chen},
-  journal={Journal of Biomedical Informatics},
-  year={2025},
-  publisher={Elsevier}
-}
-```
 
 ---
 
