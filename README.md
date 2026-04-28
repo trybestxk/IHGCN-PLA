@@ -57,22 +57,31 @@ conda activate ihgcn-pla
 
 ## Data Preparation
 
-### PDBbind v2020
+### Option 1: Use Preprocessed Data (Recommended)
 
-Download from the [official website](http://www.pdbbind.org.cn/) and place under `data/pdbbind2020/`.
+Download the preprocessed PDBbind dataset directly from Hugging Face:
 
-### NSCLC Dataset
+**[DataSet03 — Preprocessed PDBbind data (train/val/test2016/test2013)](https://huggingface.co/datasets/Trybestxk/IHGCN-PLA/tree/main/DataSet03)**
 
-Download from [Hugging Face](https://huggingface.co/trybestxk/IHGCN-PLA-data):
+Place the downloaded files under `./DataSet03/processed/`.
 
-```bash
-huggingface-cli download trybestxk/IHGCN-PLA-data --repo-type dataset --local-dir data/nsclc/
-```
+### Option 2: Preprocess from Scratch
 
-### Preprocessing
+Download PDBbind v2020 from the [official website](http://www.pdbbind.org.cn/) and run:
 
 ```bash
 python create_data.py
+```
+
+### NSCLC Dataset
+
+Download the Non-Small Cell Lung Cancer dataset from Hugging Face:
+
+**[lung.zip — NSCLC bioactivity dataset (EGFR, EML4-ALK, KRAS, MET, TP53)](https://huggingface.co/datasets/Trybestxk/IHGCN-PLA/blob/main/lung.zip)**
+
+```bash
+# Extract to data/nsclc/
+unzip lung.zip -d data/nsclc/
 ```
 
 ---
@@ -87,7 +96,7 @@ To reproduce the 10-seed benchmark results on CASF-2016 and CASF-2013, simply ru
 python test.py
 ```
 
-This loads pre-trained weights for all 10 seeds and reports performance metrics (CI, R, AUC, RMSE, SD) for each seed along with mean ± std statistics.
+This loads pre-trained weights for all 10 seeds and reports CI, R, AUC, RMSE, SD for each seed along with mean ± std statistics.
 
 ### Training from Scratch
 
@@ -107,10 +116,21 @@ python Hexplain.py
 
 ## Pre-trained Weights
 
-Pre-trained weights for all 10 seeds are available on [Hugging Face](https://huggingface.co/trybestxk/IHGCN-PLA-models):
+All pre-trained model weights are available on Hugging Face:
+
+| Description | Link |
+|-------------|------|
+| 10-seed weights (for `test.py` reproduction) | [ckpt/](https://huggingface.co/datasets/Trybestxk/IHGCN-PLA/tree/main/ckpt) |
+| Single-run weight | [result/](https://huggingface.co/datasets/Trybestxk/IHGCN-PLA/tree/main/result) |
+
+Download and place under `./ckpt/`:
 
 ```bash
-huggingface-cli download trybestxk/IHGCN-PLA-models --local-dir ckpt/
+# Download 10-seed weights
+huggingface-cli download Trybestxk/IHGCN-PLA \
+    --repo-type dataset \
+    --include "ckpt/*" \
+    --local-dir ./
 ```
 
 ---
@@ -123,10 +143,15 @@ IHGCN-PLA/
 │   ├── best_model_seed_100.pt
 │   ├── best_model_seed_5000.pt
 │   └── ...
-├── data/                        # Datasets
-│   ├── pdbbind2020/
-│   ├── nsclc/
+├── DataSet03/                   # Preprocessed dataset
 │   └── processed/
+│       ├── train.bin
+│       ├── val.bin
+│       ├── test2016.bin
+│       └── test2013.bin
+├── data/                        # Raw datasets
+│   ├── pdbbind2020/
+│   └── nsclc/
 ├── model.py                     # IHGCN-PLA architecture
 ├── train.py                     # Training script
 ├── test.py                      # Evaluation script (10-seed reproduction)
