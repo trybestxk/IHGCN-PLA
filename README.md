@@ -9,7 +9,7 @@
 
 IHGCN-PLA is a novel deep learning framework for structure-based protein-ligand binding affinity prediction. The model features **early-stage multimodal fusion** at the convolution layer level, enabling residue nodes to simultaneously aggregate intra-protein structural signals and ligand binding information within each convolutional layer.
 
-![model](C:\Users\kyx\Desktop\DTA_Heterogeneous_Graph_NENU_2025 (3)\model.png)
+![Model Architecture](./model.png)
 
 Unlike existing methods that fuse protein and ligand representations only at the final prediction stage, IHGCN-PLA introduces **operator-level heterogeneity** through specialized graph convolution operators:
 
@@ -72,46 +72,35 @@ huggingface-cli download trybestxk/IHGCN-PLA-data --repo-type dataset --local-di
 ### Preprocessing
 
 ```bash
-python preprocess.py \
-    --data_path data/pdbbind2020/ \
-    --output_path data/processed/ \
-    --pocket_cutoff 8.0
+python create_data.py
 ```
 
 ---
 
 ## Usage
 
-### Training
+### Reproducing Results
+
+To reproduce the 10-seed benchmark results on CASF-2016 and CASF-2013, simply run:
 
 ```bash
-# Multi-seed training (recommended)
-python train_fixed_seeds.py
+python test.py
+```
 
-# Single seed
-python train.py --seed 100 --lr 0.0001 --batch_size 64 --max_epochs 120
+This loads pre-trained weights for all 10 seeds and reports performance metrics (CI, R, AUC, RMSE, SD) for each seed along with mean ± std statistics.
+
+### Training from Scratch
+
+```bash
+python train.py
 ```
 
 Model weights are saved to `./ckpt/best_model_seed_{seed}.pt`
 
-### Evaluation
+### Interpretability Analysis
 
 ```bash
-# Evaluate all 10 models
-python evaluate_all_models.py
-
-# Evaluate single model
-python evaluate.py --checkpoint ckpt/best_model_seed_100.pt
-```
-
-### Prediction
-
-```bash
-python predict.py \
-    --checkpoint ckpt/best_model_seed_100.pt \
-    --protein_file examples/protein.pdb \
-    --ligand_file examples/ligand.sdf \
-    --output predictions.csv
+python Hexplain.py
 ```
 
 ---
@@ -131,19 +120,21 @@ huggingface-cli download trybestxk/IHGCN-PLA-models --local-dir ckpt/
 ```
 IHGCN-PLA/
 ├── ckpt/                        # Model weights (.pt files)
+│   ├── best_model_seed_100.pt
+│   ├── best_model_seed_5000.pt
+│   └── ...
 ├── data/                        # Datasets
 │   ├── pdbbind2020/
 │   ├── nsclc/
 │   └── processed/
-├── resultfinal/                 # Training logs and figures
 ├── model.py                     # IHGCN-PLA architecture
-├── train_fixed_seeds.py         # Multi-seed training
-├── evaluate_all_models.py       # Multi-model evaluation
-├── predict.py                   # Inference
-├── preprocess.py                # Data preprocessing
-├── Utils.py                     # Utility functions
+├── train.py                     # Training script
+├── test.py                      # Evaluation script (10-seed reproduction)
+├── create_data.py               # Data preprocessing
+├── Dataset.py                   # Dataset class
+├── Utils.py                     # Utility functions and metrics
+├── Hexplain.py                  # HeteroGNNExplainer interpretability
 ├── environment.yml              # Conda environment
-├── requirements.txt             # Pip requirements
 └── README.md
 ```
 
@@ -187,7 +178,7 @@ IHGCN-PLA/
 
 Layer 1: 108 → 108, Layer 2: 108 → 216, Layer 3: 216 → 432
 
-Final: Global max pooling → Concatenation (864-dim) → FC (864→512→256→1)
+Final: Global max pooling → Concatenation (864-dim) → FC (864 → 512 → 256 → 1)
 
 ---
 
@@ -215,4 +206,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - [PDBbind](http://www.pdbbind.org.cn/) for binding affinity data
 - [ChEMBL](https://www.ebi.ac.uk/chembl/) for bioactivity data
-- [Deep Graph Library (DGL)](https://www.dgl.ai/) for graph neural network framework
+- [Deep Graph Library (DGL)](https://www.dgl.ai/) for the graph neural network framework
